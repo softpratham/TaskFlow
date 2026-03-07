@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: taskflow-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: taskflow_db
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./taskflow
+    container_name: taskflow-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/taskflow_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "false"
+      APP_JWT_SECRET: TaskFlowSuperSecretKeyThatIsAtLeast256BitsLongForHS256Algorithm2024
+      APP_JWT_EXPIRATION_MS: "86400000"
+      SPRING_MAIL_HOST: smtp.gmail.com
+      SPRING_MAIL_PORT: "587"
+      SPRING_MAIL_USERNAME: pm.10deokar2002@gmail.com
+      SPRING_MAIL_PASSWORD: aeyefjnjgftznzci
+      APP_EMAIL_FROM: pm.10deokar2002@gmail.com
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  frontend:
+    build: ./taskflow-ui
+    container_name: taskflow-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:

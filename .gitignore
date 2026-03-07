@@ -1,0 +1,19 @@
+# Backend
+taskflow/target/
+taskflow/.idea/
+taskflow/*.iml
+
+# Frontend
+taskflow-ui/node_modules/
+taskflow-ui/dist/
+
+# Environment
+taskflow/src/main/resources/application.properties
+.env
+
+# IDE
+.idea/
+
+# OS
+.DS_Store
+*.log
