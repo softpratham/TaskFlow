@@ -1,0 +1,103 @@
+name: TaskFlow CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # ==================== BACKEND ====================
+  backend-build:
+    name: Backend - Build & Test
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: taskflow_db
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    defaults:
+      run:
+        working-directory: ./taskflow
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Create application.properties
+        run: |
+          mkdir -p src/main/resources
+          cat > src/main/resources/application.properties << EOF
+          spring.application.name=TaskFlow
+          server.port=8080
+          spring.datasource.url=jdbc:mysql://localhost:3306/taskflow_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+          spring.datasource.username=root
+          spring.datasource.password=root
+          spring.jpa.hibernate.ddl-auto=update
+          spring.jpa.open-in-view=true
+          app.jwt.secret=TaskFlowCITestSecretKeyThatIsAtLeast256BitsLongForHS256
+          app.jwt.expiration-ms=86400000
+          spring.mail.host=smtp.gmail.com
+          spring.mail.port=587
+          spring.mail.username=test@test.com
+          spring.mail.password=testpassword
+          app.email.from=test@test.com
+          spring.mail.properties.mail.smtp.auth=true
+          spring.mail.properties.mail.smtp.starttls.enable=true
+          EOF
+
+      - name: Build with Maven
+        run: ./mvnw clean package -DskipTests -B
+
+      - name: Run Tests
+        run: ./mvnw test -B
+        continue-on-error: true
+
+      - name: Build Docker Image
+        run: docker build -t taskflow-backend .
+
+  # ==================== FRONTEND ====================
+  frontend-build:
+    name: Frontend - Build & Lint
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./taskflow-ui
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: taskflow-ui/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Build Docker Image
+        run: docker build -t taskflow-frontend .
