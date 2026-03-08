@@ -63,11 +63,14 @@ jobs:
           spring.mail.properties.mail.smtp.starttls.enable=true
           EOF
 
+      - name: Make mvnw executable
+        run: chmod +x ./mvnw
+
       - name: Build with Maven
         run: ./mvnw clean package -DskipTests -B
 
       - name: Run Tests
-        run: ./mvnw test -B
+        run: chmod +x ./mvnw && ./mvnw test -B
         continue-on-error: true
 
       - name: Build Docker Image
