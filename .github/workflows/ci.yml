@@ -7,7 +7,6 @@ on:
     branches: [ main ]
 
 jobs:
-  # ==================== BACKEND ====================
   backend-build:
     name: Backend - Build & Test
     runs-on: ubuntu-latest
@@ -44,7 +43,7 @@ jobs:
       - name: Create application.properties
         run: |
           mkdir -p src/main/resources
-          cat > src/main/resources/application.properties << EOF
+          cat > src/main/resources/application.properties << 'EOF'
           spring.application.name=TaskFlow
           server.port=8080
           spring.datasource.url=jdbc:mysql://localhost:3306/taskflow_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
@@ -63,11 +62,8 @@ jobs:
           spring.mail.properties.mail.smtp.starttls.enable=true
           EOF
 
-      - name: Make mvnw executable
-        run: chmod +x ./mvnw
-
       - name: Build with Maven
-        run: ./mvnw clean package -DskipTests -B
+        run: chmod +x ./mvnw && ./mvnw clean package -DskipTests -B
 
       - name: Run Tests
         run: chmod +x ./mvnw && ./mvnw test -B
@@ -76,7 +72,6 @@ jobs:
       - name: Build Docker Image
         run: docker build -t taskflow-backend .
 
-  # ==================== FRONTEND ====================
   frontend-build:
     name: Frontend - Build & Lint
     runs-on: ubuntu-latest
