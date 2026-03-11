@@ -8,7 +8,6 @@ taskflow-ui/node_modules/
 taskflow-ui/dist/
 
 # Environment
-taskflow/src/main/resources/application.properties
 .env
 
 # IDE
