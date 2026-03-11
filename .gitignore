@@ -1,18 +1,22 @@
-# Backend
+# --- Projects ---
 taskflow/target/
-taskflow/.idea/
-taskflow/*.iml
-
-# Frontend
 taskflow-ui/node_modules/
 taskflow-ui/dist/
 
-# Environment
+# --- Environment & Secrets ---
 .env
+*.local
+taskflow/src/main/resources/application-local.properties
 
-# IDE
+# --- IDE & OS ---
 .idea/
-
-# OS
+.vscode/
+*.iml
+*.iws
+*.ipr
 .DS_Store
+Thumbs.db
+
+# --- Logs ---
 *.log
+npm-debug.log*
