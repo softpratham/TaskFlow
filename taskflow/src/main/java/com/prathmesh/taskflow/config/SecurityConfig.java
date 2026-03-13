@@ -32,7 +32,7 @@ public class SecurityConfig {
                     var corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
                     corsConfiguration.setAllowedOrigins(java.util.List.of(
                             "http://localhost:5173",             // Local Development
-                            "https://TaskFlow-App.vercel.app"    // Vercel Frontend
+                            "https://clever-simplicity-production.up.railway.app"    // Vercel Frontend
                     ));
                     corsConfiguration.setAllowedMethods(java.util.List.of(
                             "GET", "POST", "PUT", "DELETE", "OPTIONS"
