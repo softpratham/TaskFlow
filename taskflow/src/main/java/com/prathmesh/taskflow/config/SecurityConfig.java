@@ -35,7 +35,6 @@ public class SecurityConfig {
                         "http://localhost:5174",
                         "https://TaskFlow-App.vercel.app",
                         "https://clever-simplicity-production.up.railway.app"
-                        "https://taskflow-taskmanagement.up.railway.app"
                     ));
 
                     corsConfiguration.setAllowedMethods(java.util.List.of(
